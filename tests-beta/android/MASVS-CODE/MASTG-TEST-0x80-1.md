@@ -9,19 +9,27 @@ profiles: [L2]
 
 ## Overview
 
-This test verifies whether an app can force the user to update their app version when direct to by a the backend. This can be done by submitting the current version to the backend and blocking the user from using the application in case the backend deteremins that the user should update.
+This test verifies whether the app enforces an update (@MASTG-KNOW-0023) when directed by the backend. In a backend-gated flow, the app typically sends the current app version (for example, via `BuildConfig.VERSION_NAME`/`BuildConfig.VERSION_CODE`) and receives a response indicating whether the version is supported. Alternatively, the app may use the [Google Play In-App Updates APIs](https://developer.android.com/guide/playcore/in-app-updates) for an immediate update (for example, [`AppUpdateManager`](https://developer.android.com/reference/com/google/android/play/core/appupdate/AppUpdateManager)).
 
 ## Steps
 
-1. Obtain a MitM position between the application and its backend (see @MASTG-TECH-0011).
-2. Identify if version information is sent to the backend or if a minimum supported version is retrieved from the backend. This can be as part of a header, the URL, a URL parameter or the HTTP body.
-3. In case the app's version is submitted to the backend, interact with the backend to see if different version numbers trigger different responses.
-4. If a different response can be identified, modify an active request with the old version number to examine how the application reacts to the new backend response.
+1. Apply @MASTG-TECH-0011 (MITM) to capture launch traffic and initial API calls. Filter for headers, parameters, or body fields carrying version information (for example, `X-App-Version`, `version`, `build`, `minVersion`).
+2. Use @MASTG-TECH-0033 (dynamic instrumentation) to hook relevant classes or methods that retrieve the app version (such as `BuildConfig.VERSION_NAME`) or that are specifically related to update flows (for example, `AppUpdateManager#getAppUpdateInfo`, `AppUpdateManager#startUpdateFlowForResult`, or the code that evaluates `minVersion`).
 
 ## Observation
 
-The server responds differently to older versions.
+The output should contain:
+
+- a network traffic trace showing version values in requests and corresponding backend responses for different versions
+- a method trace showing which APIs were called
 
 ## Evaluation
 
-The test case fails if the application does not send its version information to the backend.
+The test case fails if the app does not implement enforced updating. For example, if it neither uses the Play In-App Updates API nor performs backend-gated version checks or if it implements them incorrectly.
+
+**Additional Verification:**
+
+Validate whether the backend indicates that an update is required but the app still allows you to continue using it (this may require manual testing). For example:
+
+- Try to dismiss any update prompts or navigate around them.
+- Modify requests to present an older version (for example, change `version`/`build`), replay the request, and observe whether the backend response changes (for example, an error or a field indicating an update is required).

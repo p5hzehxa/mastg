@@ -9,19 +9,18 @@ profiles: [L2]
 
 ## Overview
 
-This test verifies whether an app can force the user to update their app version when direct to by a the backend. This can be done by submitting the current version to the backend and blocking the user from using the application in case the backend deteremins that the user should update.
+This test verifies whether the app enforces an update (@MASTG-KNOW-0074) when directed by the backend. On iOS, apps typically read `CFBundleShortVersionString`/`CFBundleVersion` (for example, via `Bundle.main.infoDictionary`) and compare against a minimum supported version returned by the backend over `URLSession`. If an update is required, the app should block usage and optionally redirect to the App Store (for example, via `UIApplication.open` or a StoreKit product view).
 
 ## Steps
 
-1. Run a static analysis tool (@MASTG-TECH-0066) to examine the initial code flows of the application. Look for all paths that are executed before the user authenticates.
-
-1. Examine the startup flow of the application. Identify if the application calls out to a backend with the application's version information included.
-2. Examine if the application can handle a specific response from the backend indicating that the application must be updated. For example, the application might evaluate the response from the backend and show a specific error message. Note that the error message can also come from the backend, so the lack of a custom error message in the application does not mean that the feature isn't implemented.
+1. Apply @MASTG-TECH-0066 (static analysis) and examine startup code paths that run before authentication (for example, `AppDelegate.application(_:didFinishLaunchingWithOptions:)`, `SceneDelegate.scene(_:willConnectTo:)`, initial view controllers).
+2. Locate version retrieval and comparison logic (for example, reads of `CFBundleShortVersionString`/`CFBundleVersion` and comparisons against a constant or value from a backend response).
+3. Identify `URLSession` calls that send the app version (for example, headers or JSON fields like `version`, `build`) or that request the minimum supported version. Trace the code that handles an "update required" response to verify enforced blocking (for example, non-dismissible `UIAlertController`, disabling navigation, or redirection using `UIApplication.shared.open`).
 
 ## Observation
 
-The application contains specific logic to handle a force-update event. The user may be able to ignore the prompt and continue using the application, or they may be unable to use the application without updating.
+The output should contain a list of code locations where the app retrieves its version (`CFBundleShortVersionString`/`CFBundleVersion`), performs version comparisons, and makes `URLSession` calls that carry or request version information, plus a call graph snippet showing the enforced update path (for example, blocking UI or redirection) executes before authentication.
 
 ## Evaluation
 
-The test case fails if the application does not contain any logic to handle a forced application update. Additionally, the test case fails if the application informs the user that they must update, but the user can ignore the prompt and still use the application.
+The test case fails if no code paths implement an enforced update before authentication, if version checks are present but do not lead to blocking behavior when required, or if the app informs you that you must update but still allows you to continue using it.

@@ -9,18 +9,32 @@ profiles: [L2]
 
 ## Overview
 
-This test verifies whether an app can force the user to update their app version when direct to by a the backend. This can be done by submitting the current version to the backend and blocking the user from using the application in case the backend deteremins that the user should update. The user should not be able to ignore or skip the forced update.
+This test verifies whether the app enforces an update (@MASTG-KNOW-0023) when directed by the backend. The app should either send its current version to the backend or retrieve the minimum supported version and prevent usage until the app is updated.
+
+On Android, enforced updates are commonly implemented using the Google Play In-App Updates API or a custom backend-gated flow that evaluates the app version retrieved via `BuildConfig.VERSION_NAME`/`BuildConfig.VERSION_CODE` (or `PackageInfo` via `PackageManager`).
+
+Specifically, look for:
+
+- Google Play In-App Updates classes and methods: `AppUpdateManagerFactory.create`, `AppUpdateManager#getAppUpdateInfo`, `UpdateAvailability.UPDATE_AVAILABLE`, `AppUpdateType.IMMEDIATE`/`FLEXIBLE`, `startUpdateFlowForResult`/`requestUpdateFlow`.
+- Version retrieval points: `BuildConfig.VERSION_NAME`, `BuildConfig.VERSION_CODE` (or `PackageInfo` via `PackageManager`).
+- Strings like `X-App-Version`, `version`, `minVersion` that may indicate version checks in network requests or other parts of the code.
 
 ## Steps
 
-1. Run a static analysis tool (@MASTG-TECH-0014) to examine the initial code flows of the application. Look for all paths that are executed before the user authenticates.
-2. Identify if the application calls out to a backend with the application's version information included, or if the app requests a minimum allowed version from the backend.
-3. Examine if the application can prevent the user from using the application based off the information retrieved from the backend. 
+1. Apply @MASTG-TECH-0014 (static analysis) and search for Android update/version APIs used before authentication (for example, in `Application.onCreate`, splash/bootstrap flows, or initial `Activity.onCreate`).
 
 ## Observation
 
-The application contains specific logic to handle a force-update event. The user may be able to ignore the prompt and continue using the application, or they may be unable to use the application without updating.
+The output should contain a list of code locations where the app retrieves or sends its version (for example, `BuildConfig.VERSION_NAME` or `PackageInfo`) and uses the Google Play In-App Updates APIs (for example, `AppUpdateManager`, `startUpdateFlowForResult`), or evaluates a backend `minVersion` response, along with a call graph snippet showing these checks execute before authentication.
 
 ## Evaluation
 
-The test case fails if the application does not contain any logic to handle a forced application update. Additionally, the test case fails if the application informs the user that they must update, but the user can ignore the prompt and still use the application.
+The test case fails if no code paths implement an enforced update before authentication, if the identified logic is not reachable prior to authentication, or if the app displays a mandatory update message but still allows you to continue using the app (for example, dismissing the dialog or navigating around it).
+
+Note that this evaluation requires manual review of the identified code paths in the reverse engineered code to confirm whether they implement enforced updating correctly.
+
+For example, you should try to trace the control flow to confirm that version evaluation leads to an enforced update path, such as:
+    - Immediate update flow (`AppUpdateType.IMMEDIATE`), or
+    - A custom blocking UI (for example, a full-screen dialog/`Activity` that disables navigation) when backend `minVersion` > current version.
+
+Alternatively, you can use dynamic analysis (see @MASTG-TEST-0x80-1) to confirm the identified code paths execute before authentication and enforce updating as expected.
