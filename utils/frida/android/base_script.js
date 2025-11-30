@@ -91,16 +91,59 @@ function registerNativeHook(hook, categoryName, callback) {
 
   Interceptor.attach(address, {
     onEnter: function(args) {
-      var stackTrace = [];
+      // Capture full native stack first (no truncation yet)
+      var fullNativeStack = [];
       try {
-        var bt = Thread.backtrace(this.context, Backtracer.ACCURATE);
-        for (var i = 0; i < bt.length; i++) {
-          if (maxFrames !== -1 && i >= maxFrames) break;
-          stackTrace.push(DebugSymbol.fromAddress(bt[i]).toString());
+        var btFull = Thread.backtrace(this.context, Backtracer.FUZZY);
+        for (var i = 0; i < btFull.length; i++) {
+          try {
+            fullNativeStack.push(DebugSymbol.fromAddress(btFull[i]).toString());
+          } catch (e2) {
+            fullNativeStack.push(btFull[i].toString());
+          }
         }
       } catch (e) {
-        stackTrace.push("<backtrace unavailable: " + e + ">");
+        fullNativeStack.push("<backtrace unavailable: " + e + ">");
       }
+
+      // Capture full Java stack (no truncation yet)
+      var fullJavaStack = null;
+      if (Java.available) {
+        try {
+          var Exception = Java.use("java.lang.Exception");
+          var stJavaFull = Exception.$new().getStackTrace();
+          var jstFull = [];
+          for (var j = 0; j < stJavaFull.length; j++) {
+            jstFull.push(stJavaFull[j].toString());
+          }
+          fullJavaStack = jstFull;
+        } catch (je) {
+          // ignore
+        }
+      }
+
+      // Filtering uses full stacks before truncation
+      if (hook.filterEventsByStacktrace) {
+        var combinedFull = (fullJavaStack && fullJavaStack.length ? fullJavaStack : fullNativeStack);
+        var needle = hook.filterEventsByStacktrace;
+        var found = false;
+        for (var k = 0; k < combinedFull.length; k++) {
+            if (combinedFull[k].indexOf(needle) !== -1) { found = true; break; }
+        }
+        if (!found) {
+          return; // suppress event
+        }
+      }
+
+      // Apply maxFrames truncation only for emission. If filtering was used, emit full stack to ensure visibility of matching frame.
+      function _truncate(arr) {
+        if (hook.filterEventsByStacktrace) return arr.slice();
+        if (maxFrames === -1) return arr.slice();
+        var out = [];
+        for (var t = 0; t < arr.length && t < maxFrames; t++) out.push(arr[t]);
+        return out;
+      }
+      var effectiveStack = fullJavaStack && fullJavaStack.length ? _truncate(fullJavaStack) : _truncate(fullNativeStack);
 
       this._mastgEvent = {
         id: generateUUID(),
@@ -110,7 +153,7 @@ function registerNativeHook(hook, categoryName, callback) {
         module: hook.module || "<global>",
         symbol: hook.symbol,
         address: address.toString(),
-        stackTrace: stackTrace
+        stackTrace: effectiveStack
       };
 
       callback(this._mastgEvent);
@@ -406,38 +449,30 @@ function registerAllHooks(hook, categoryName, callback, cachedOperations) {
     }
   });
 
-  // Register native hooks first (outside Java.perform)
+  // Prepare native summary upfront without attaching hooks yet
   var nativeHooksSummary = [];
   var nativeErrors = [];
   nativeHooks.forEach(function(hook) {
     try {
-      registerNativeHook(hook, target.category, callback);
+      // Attempt to resolve symbol to surface errors early, but do not attach
+      var addr = resolveNativeSymbol(hook);
+      if (!addr) {
+        nativeErrors.push("Failed to resolve native symbol '" + hook.symbol + "'" + (hook.module ? " in module '" + hook.module + "'" : ""));
+      }
       nativeHooksSummary.push({
         module: hook.module || "<global>",
         symbol: hook.symbol
       });
     } catch (e) {
-      var errMsg = "Failed to register native hook for symbol '" + hook.symbol + "': " + e;
+      var errMsg = "Failed to resolve native hook for symbol '" + hook.symbol + "': " + e;
       console.error(errMsg);
       nativeErrors.push(errMsg);
     }
   });
 
-  // Emit native hooks summary if there are any
-  if (nativeHooks.length > 0) {
-    var nativeSummary = {
-      type: "native-summary",
-      hooks: nativeHooksSummary,
-      totalHooks: nativeHooksSummary.length,
-      errors: nativeErrors,
-      totalErrors: nativeErrors.length
-    };
-    console.log(JSON.stringify(nativeSummary, null, 2));
-  }
-
-  // Register Java hooks inside Java.perform
-  if (javaHooks.length > 0) {
-    Java.perform(function() {
+  // Register hooks inside Java.perform, but only after emitting both summaries
+  // Enter Java.perform to allow Java stack augmentation (even if only native hooks)
+  Java.perform(function() {
       // Pre-compute hook operations once to avoid redundant processing
       var hookOperationsCache = [];
       javaHooks.forEach(function(hook) {
@@ -447,7 +482,21 @@ function registerAllHooks(hook, categoryName, callback, cachedOperations) {
         });
       });
 
-      // Emit an initial summary of all overloads that will be hooked
+      // (Removed package resolution and dynamic update logic)
+
+      // 1) Emit native summary
+      if (nativeHooks.length > 0) {
+        var nativeSummary = {
+          type: "native-summary",
+          hooks: nativeHooksSummary,
+          totalHooks: nativeHooksSummary.length,
+          errors: nativeErrors,
+          totalErrors: nativeErrors.length
+        };
+        console.log(JSON.stringify(nativeSummary, null, 2));
+      }
+
+      // 2) Emit an initial summary for Java overloads
       try {
         // Aggregate map nested by class then method
         var aggregate = {};
@@ -491,10 +540,21 @@ function registerAllHooks(hook, categoryName, callback, cachedOperations) {
         console.error("Summary generation failed, but hooking will continue. Error:", e);
       }
 
-      // Register hooks using cached operations
+      // 3) Now that both summaries were emitted, attach native hooks
+
+      if (nativeHooks.length > 0) {
+        nativeHooks.forEach(function(hook) {
+          try {
+            registerNativeHook(hook, target.category, callback);
+          } catch (e) {
+            console.error("Failed to register native hook after summary for symbol '" + hook.symbol + "': " + e);
+          }
+        });
+      }
+
+      // 4) Register Java hooks using cached operations
       hookOperationsCache.forEach(function(cached) {
         registerAllHooks(cached.hook, target.category, callback, cached.built);
       });
     });
-  }
 })();
