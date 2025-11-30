@@ -45,6 +45,83 @@ function generateUUID() {
   });
 }
 
+/**
+ * Checks if a hook definition is for a native function.
+ * @param {object} hook - Hook definition object.
+ * @returns {boolean} True if the hook targets a native function.
+ */
+function isNativeHook(hook) {
+  return hook.native === true;
+}
+
+/**
+ * Resolves the address of a native symbol for Interceptor.attach.
+ * @param {object} hook - Native hook definition with symbol and optional module.
+ * @returns {NativePointer|null} The address of the symbol, or null if not found.
+ */
+function resolveNativeSymbol(hook) {
+  try {
+    if (hook.module) {
+      var mod = Process.getModuleByName(hook.module);
+      return mod.getExportByName(hook.symbol);
+    } else {
+      return Module.getGlobalExportByName(hook.symbol);
+    }
+  } catch (e) {
+    console.error("Failed to resolve native symbol '" + hook.symbol + "'" +
+      (hook.module ? " in module '" + hook.module + "'" : "") + ": " + e);
+    return null;
+  }
+}
+
+/**
+ * Registers a native function hook using Frida's Interceptor API.
+ * @param {object} hook - Native hook definition.
+ * @param {string} categoryName - OWASP MAS category for identification.
+ * @param {function} callback - Callback function for hook events.
+ */
+function registerNativeHook(hook, categoryName, callback) {
+  var address = resolveNativeSymbol(hook);
+  if (!address) {
+    console.error("Cannot attach to native symbol '" + hook.symbol + "': address not resolved.");
+    return;
+  }
+
+  var maxFrames = typeof hook.maxFrames === 'number' ? hook.maxFrames : 8;
+
+  Interceptor.attach(address, {
+    onEnter: function(args) {
+      var stackTrace = [];
+      try {
+        var bt = Thread.backtrace(this.context, Backtracer.ACCURATE);
+        for (var i = 0; i < bt.length; i++) {
+          if (maxFrames !== -1 && i >= maxFrames) break;
+          stackTrace.push(DebugSymbol.fromAddress(bt[i]).toString());
+        }
+      } catch (e) {
+        stackTrace.push("<backtrace unavailable: " + e + ">");
+      }
+
+      this._mastgEvent = {
+        id: generateUUID(),
+        type: "native-hook",
+        category: categoryName,
+        time: new Date().toISOString(),
+        module: hook.module || "<global>",
+        symbol: hook.symbol,
+        address: address.toString(),
+        stackTrace: stackTrace
+      };
+
+      callback(this._mastgEvent);
+    },
+    onLeave: function(retval) {
+      // Optionally emit a separate event or extend the onEnter event
+      // For now, we just log the return if needed
+    }
+  });
+}
+
 
 /**
  * Overloads a method. If the method is called, the parameters and the return value are decoded and together with a stack trace send back to the frida.re client.
@@ -312,68 +389,112 @@ function registerAllHooks(hook, categoryName, callback, cachedOperations) {
   });
 }
 
-Java.perform(function () {
-
-  function callback(event){
-    console.log(JSON.stringify(event, null, 2))
+// Main execution: separate native hooks from Java hooks
+(function() {
+  function callback(event) {
+    console.log(JSON.stringify(event, null, 2));
   }
 
-  // Pre-compute hook operations once to avoid redundant processing
-  var hookOperationsCache = [];
-  target.hooks.forEach(function (hook, _) {
-    hookOperationsCache.push({
-      hook: hook,
-      built: buildHookOperations(hook)
-    });
+  // Separate hooks into native and Java categories
+  var nativeHooks = [];
+  var javaHooks = [];
+  target.hooks.forEach(function(hook) {
+    if (isNativeHook(hook)) {
+      nativeHooks.push(hook);
+    } else {
+      javaHooks.push(hook);
+    }
   });
 
-  // Emit an initial summary of all overloads that will be hooked
-  try {
-    // Aggregate map nested by class then method
-    var aggregate = {};
-    var total = 0;
-    var errors = [];
-    var totalErrors = 0;
-    hookOperationsCache.forEach(function (cached) {
-      total += cached.built.count;
-      if (cached.built.errors && cached.built.errors.length) {
-        Array.prototype.push.apply(errors, cached.built.errors);
-        totalErrors += cached.built.errors.length;
+  // Register native hooks first (outside Java.perform)
+  var nativeHooksSummary = [];
+  var nativeErrors = [];
+  nativeHooks.forEach(function(hook) {
+    try {
+      registerNativeHook(hook, target.category, callback);
+      nativeHooksSummary.push({
+        module: hook.module || "<global>",
+        symbol: hook.symbol
+      });
+    } catch (e) {
+      var errMsg = "Failed to register native hook for symbol '" + hook.symbol + "': " + e;
+      console.error(errMsg);
+      nativeErrors.push(errMsg);
+    }
+  });
+
+  // Emit native hooks summary if there are any
+  if (nativeHooks.length > 0) {
+    var nativeSummary = {
+      type: "native-summary",
+      hooks: nativeHooksSummary,
+      totalHooks: nativeHooksSummary.length,
+      errors: nativeErrors,
+      totalErrors: nativeErrors.length
+    };
+    console.log(JSON.stringify(nativeSummary, null, 2));
+  }
+
+  // Register Java hooks inside Java.perform
+  if (javaHooks.length > 0) {
+    Java.perform(function() {
+      // Pre-compute hook operations once to avoid redundant processing
+      var hookOperationsCache = [];
+      javaHooks.forEach(function(hook) {
+        hookOperationsCache.push({
+          hook: hook,
+          built: buildHookOperations(hook)
+        });
+      });
+
+      // Emit an initial summary of all overloads that will be hooked
+      try {
+        // Aggregate map nested by class then method
+        var aggregate = {};
+        var total = 0;
+        var errors = [];
+        var totalErrors = 0;
+        hookOperationsCache.forEach(function(cached) {
+          total += cached.built.count;
+          if (cached.built.errors && cached.built.errors.length) {
+            Array.prototype.push.apply(errors, cached.built.errors);
+            totalErrors += cached.built.errors.length;
+          }
+          cached.built.operations.forEach(function(op) {
+            if (!aggregate[op.clazz]) {
+              aggregate[op.clazz] = {};
+            }
+            if (!aggregate[op.clazz][op.method]) {
+              aggregate[op.clazz][op.method] = [];
+            }
+            aggregate[op.clazz][op.method].push(op.args);
+          });
+        });
+
+        var overloadList = [];
+        for (var clazz in aggregate) {
+          if (!aggregate.hasOwnProperty(clazz)) continue;
+          var methodsMap = aggregate[clazz];
+          for (var methodName in methodsMap) {
+            if (!methodsMap.hasOwnProperty(methodName)) continue;
+            var entries = methodsMap[methodName].map(function(argsArr) {
+              return { args: argsArr };
+            });
+            overloadList.push({ class: clazz, method: methodName, overloads: entries });
+          }
+        }
+
+        var summary = { type: "summary", hooks: overloadList, totalHooks: total, errors: errors, totalErrors: totalErrors };
+        console.log(JSON.stringify(summary, null, 2));
+      } catch (e) {
+        // If summary fails, don't block hooking
+        console.error("Summary generation failed, but hooking will continue. Error:", e);
       }
-      cached.built.operations.forEach(function (op) {
-        if (!aggregate[op.clazz]) {
-          aggregate[op.clazz] = {};
-        }
-        if (!aggregate[op.clazz][op.method]) {
-          aggregate[op.clazz][op.method] = [];
-        }
-        aggregate[op.clazz][op.method].push(op.args);
+
+      // Register hooks using cached operations
+      hookOperationsCache.forEach(function(cached) {
+        registerAllHooks(cached.hook, target.category, callback, cached.built);
       });
     });
-
-    var overloadList = [];
-    for (var clazz in aggregate) {
-      if (!aggregate.hasOwnProperty(clazz)) continue;
-      var methodsMap = aggregate[clazz];
-      for (var methodName in methodsMap) {
-        if (!methodsMap.hasOwnProperty(methodName)) continue;
-        var entries = methodsMap[methodName].map(function (argsArr) {
-          return { args: argsArr };
-        });
-        overloadList.push({ class: clazz, method: methodName, overloads: entries });
-      }
-    }
-
-    var summary = { type: "summary", hooks: overloadList, totalHooks: total, errors: errors, totalErrors: totalErrors };
-    console.log(JSON.stringify(summary, null, 2));
-  } catch (e) {
-    // If summary fails, don't block hooking
-    console.error("Summary generation failed, but hooking will continue. Error:", e);
   }
-
-  // Register hooks using cached operations
-  hookOperationsCache.forEach(function (cached) {
-    registerAllHooks(cached.hook, target.category, callback, cached.built);
-  });
-
-});
+})();
