@@ -18,7 +18,7 @@ An iOS app may have hardcoded HTTP URLs embedded in the app binary, library bina
 ## Steps
 
 1. Extract the app (@MASTG-TECH-0058).
-2. Run a static analysis tool such as @MASTG-TOOL-0073 on the app binary and look for any `http://` URLs.
+2. Run a static analysis tool such as @MASTG-TOOL-0073 on the app binary and search for any `http://` URLs using string analysis commands (e.g., `izz~http://` to search strings or `/` for pattern search).
 
 ## Observation
 
