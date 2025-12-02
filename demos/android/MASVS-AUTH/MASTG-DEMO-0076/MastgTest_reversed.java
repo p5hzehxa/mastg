@@ -1,19 +1,11 @@
 package org.owasp.mastestapp;
 
 import android.content.Context;
-import android.os.Build;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
-import java.security.KeyStore;
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 
 public final class MastgTest {
     private final Context context;
-    private final String KEY_NAME = "mastg_biometric_key";
 
     public MastgTest(Context context) {
         this.context = context;

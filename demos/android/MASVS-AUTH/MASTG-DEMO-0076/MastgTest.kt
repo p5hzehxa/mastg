@@ -1,21 +1,12 @@
 package org.owasp.mastestapp
 
 import android.content.Context
-import android.os.Build
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import java.security.KeyStore
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
 
 // SUMMARY: This sample demonstrates insecure biometric authentication that allows fallback to device credentials.
 
 class MastgTest(private val context: Context) {
-
-    private val KEY_NAME = "mastg_biometric_key"
 
     fun mastgTest(): String {
         val result = StringBuilder()
