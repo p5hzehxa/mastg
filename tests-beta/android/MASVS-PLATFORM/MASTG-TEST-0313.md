@@ -23,7 +23,7 @@ The primary security concerns when using `PendingIntent` are:
 
 - **Mutability**: A mutable `PendingIntent` allows the receiving app to modify the base intent's unfilled fields (action, data, categories, extras, etc.). This can enable malicious apps to redirect the intent to unintended components or inject malicious data. Use [`PendingIntent.FLAG_IMMUTABLE`](https://developer.android.com/reference/android/app/PendingIntent#FLAG_IMMUTABLE) to prevent modification of the base intent. Note that prior to Android 12 (API level 31), `PendingIntent` objects were mutable by default, while since Android 12 they are [immutable by default](https://developer.android.com/about/versions/12/behavior-changes-12#pending-intent-mutability).
 
-- **Implicit Intents**: Using an implicit base intent (without explicitly specifying the target component's package, class, or action) can allow malicious apps to intercept the `PendingIntent` and redirect its execution. Always specify the exact package, action, and component in the base intent.
+- **Implicit Intents**: Using an implicit base intent (without explicitly specifying the target component class) can allow malicious apps to intercept the `PendingIntent` and redirect its execution. An intent should use `setClass()`, `setClassName()`, or `setComponent()` to specify the target component explicitly.
 
 For more details on `PendingIntent` security, refer to @MASTG-KNOW-0024 and the [Android security documentation on pending intents](https://developer.android.com/topic/security/risks/pending-intent).
 
@@ -50,4 +50,4 @@ The test case fails if any of the following conditions are met:
 
 - A `PendingIntent` is created without `FLAG_IMMUTABLE` when the app's `minSdkVersion` is below 31, unless there is a specific need for mutability that is properly justified and the app takes other precautions.
 - A `PendingIntent` is created with `FLAG_MUTABLE` without a valid use case requiring mutability (e.g., inline reply actions).
-- The base intent is implicit (does not specify the target package, class, or component), allowing potential hijacking by malicious apps.
+- The base intent is implicit (does not specify the target component using `setClass()`, `setClassName()`, or `setComponent()`), allowing potential hijacking by malicious apps.
