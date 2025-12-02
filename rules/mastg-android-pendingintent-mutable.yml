@@ -1,0 +1,15 @@
+rules:
+  - id: mastg-android-pendingintent-mutable
+    severity: WARNING
+    languages:
+      - java
+    metadata:
+      summary: Detects PendingIntent creation that may be vulnerable due to mutability or implicit base intents.
+    message: "[MASVS-PLATFORM-1] PendingIntent created without FLAG_IMMUTABLE or using implicit intent may be vulnerable to hijacking."
+    pattern-either:
+      - pattern: PendingIntent.getActivity($CTX, $REQ, $INTENT, $FLAGS)
+      - pattern: PendingIntent.getActivities($CTX, $REQ, $INTENTS, $FLAGS)
+      - pattern: PendingIntent.getActivities($CTX, $REQ, $INTENTS, $FLAGS, $BUNDLE)
+      - pattern: PendingIntent.getService($CTX, $REQ, $INTENT, $FLAGS)
+      - pattern: PendingIntent.getForegroundService($CTX, $REQ, $INTENT, $FLAGS)
+      - pattern: PendingIntent.getBroadcast($CTX, $REQ, $INTENT, $FLAGS)
