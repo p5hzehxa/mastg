@@ -1,0 +1,21 @@
+Scanning 1 file.
+
+Findings:
+
+  MastgTest_reversed.java
+     mastg-android-biometric-device-credential-fallback
+        [MASVS-AUTH] BiometricPrompt allows fallback to device credentials. For sensitive operations, consider using BIOMETRIC_STRONG only.
+
+         26┆ int canAuthenticateWithFallback = biometricManager.canAuthenticate(
+         27┆     BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL
+         28┆ );
+
+         40┆ BiometricPrompt.PromptInfo insecurePromptInfo = new BiometricPrompt.PromptInfo.Builder()
+         41┆     .setTitle("Authenticate")
+         42┆     .setSubtitle("Verify your identity")
+         43┆     .setAllowedAuthenticators(
+         44┆         BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL
+         45┆     )
+         46┆     .build();
+
+Ran 1 rule on 1 file: 2 findings.

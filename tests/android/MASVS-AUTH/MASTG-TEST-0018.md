@@ -8,6 +8,9 @@ title: Testing Biometric Authentication
 masvs_v1_levels:
 - L2
 profiles: [L2]
+status: deprecated
+covered_by: [MASTG-TEST-0313, MASTG-TEST-0314, MASTG-TEST-0315]
+deprecation_note: New version available in MASTG V2
 ---
 
 ## Overview
