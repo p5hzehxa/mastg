@@ -1,8 +1,9 @@
 {
-    // Per-directory configuration for tests-beta/
-    // Extends the root configuration and adds a rule to prevent MASTG-TOOL references
-    // NOTE: search-replace rules must be fully repeated here as arrays don't merge with "extends"
-    "extends": "../.markdownlint.jsonc",
+  // Additional lint rules for tests-beta/
+  // NOTE: The no-tool-references-in-tests rule only applies to files in this directory
+  // This rule enforces that tests should reference @MASTG-TECH-xxxx instead of @MASTG-TOOL-xxxx
+  // Since search-replace rules arrays don't merge, we must include all parent rules here
+  "config": {
     "search-replace": {
       "rules": [
         {
@@ -55,3 +56,4 @@
       ]
     }
   }
+}
