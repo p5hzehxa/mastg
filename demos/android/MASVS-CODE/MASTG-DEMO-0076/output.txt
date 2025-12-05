@@ -1,0 +1,2 @@
+16:            android:name="android.webkit.WebView.EnableSafeBrowsing"
+17-            android:value="false" />
