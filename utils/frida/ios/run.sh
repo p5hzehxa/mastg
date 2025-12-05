@@ -14,6 +14,7 @@ randomNumber=$RANDOM
 
 # run the merged frida.re script
 frida -U -f org.owasp.mastestapp.MASTestApp-iOS -l /tmp/frida_script_$randomNumber.js -o output.json
+# frida -n MASTestApp -l /tmp/frida_script_$randomNumber.js -o output.json
 
 # cleanup
 rm /tmp/frida_script_$randomNumber.js
