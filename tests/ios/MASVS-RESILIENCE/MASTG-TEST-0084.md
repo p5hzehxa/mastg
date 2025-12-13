@@ -8,6 +8,9 @@ title: Testing for Debugging Code and Verbose Error Logging
 masvs_v1_levels:
 - R
 profiles: [R]
+status: deprecated
+covered_by: [MASTG-TEST-0318]
+deprecation_note: "New version available in MASTG v2 focusing on verbose logging that exposes implementation details"
 ---
 
 ## Overview
