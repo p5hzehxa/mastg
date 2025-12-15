@@ -50,6 +50,82 @@ There are a couple of things to consider:
 
 This should be sufficient for an app analysis and therefore, `SFSafariViewController`s are out of scope for the Static and Dynamic Analysis sections.
 
+## WebView File Access
+
+WebViews in iOS can be configured to allow access to local files using the `file://` URL scheme. The behavior and configurability differ between `UIWebView` and `WKWebView`.
+
+### UIWebView File Access
+
+`UIWebView` is deprecated starting on iOS 12 and should not be used. When it comes to file access:
+
+- The `file://` scheme is always enabled.
+- File access from `file://` URLs is always enabled.
+- Universal access from `file://` URLs is always enabled.
+
+These settings cannot be changed, making `UIWebView` inherently insecure for loading local content, especially if JavaScript is enabled (which cannot be disabled in `UIWebView`).
+
+### WKWebView File Access
+
+`WKWebView` provides more granular control over file access through undocumented properties:
+
+- The `file://` scheme is always enabled and cannot be disabled.
+- File access from `file://` URLs is disabled by default.
+
+The following properties can be used to configure file access (both are undocumented and must be set via Key-Value Coding):
+
+- `allowFileAccessFromFileURLs` ([`WKPreferences`](https://developer.apple.com/documentation/webkit/wkpreferences), `false` by default): enables JavaScript running in the context of a `file://` scheme URL to access content from other `file://` scheme URLs.
+- `allowUniversalAccessFromFileURLs` ([`WKWebViewConfiguration`](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration), `false` by default): enables JavaScript running in the context of a `file://` scheme URL to access content from any origin.
+
+These properties can be set using `setValue:forKey:`:
+
+Objective-C:
+
+```objectivec
+[webView.configuration.preferences setValue:@YES forKey:@"allowFileAccessFromFileURLs"];
+[webView.configuration setValue:@YES forKey:@"allowUniversalAccessFromFileURLs"];
+```
+
+Swift:
+
+```swift
+webView.configuration.preferences.setValue(true, forKey: "allowFileAccessFromFileURLs")
+webView.configuration.setValue(true, forKey: "allowUniversalAccessFromFileURLs")
+```
+
+### Loading Local Files
+
+When loading local HTML files, developers typically use one of the following methods:
+
+- [`loadHTMLString:baseURL:`](https://developer.apple.com/documentation/webkit/wkwebview/1415004-loadhtmlstring): loads HTML content from a string with a specified base URL.
+- [`loadData:MIMEType:textEncodingName:baseURL:`](https://developer.apple.com/documentation/webkit/wkwebview/1415011-loaddata): loads data with a specified MIME type and base URL.
+- [`loadFileURL:allowingReadAccessToURL:`](https://developer.apple.com/documentation/webkit/wkwebview/1414973-loadfileurl): loads a file from the local file system with controlled read access.
+
+The `baseURL` parameter in the first two methods determines the effective origin of the loaded content:
+
+- For `WKWebView`: setting `baseURL` to `nil` sets the effective origin to "null", which is safe as it prevents cross-origin access.
+- For `UIWebView` (deprecated): setting `baseURL` to `nil` results in an effective origin of `applewebdata://`, which does not implement same-origin policy and can allow access to local files.
+
+When using `loadFileURL:allowingReadAccessToURL:`, the second parameter controls what files the WebView can access:
+
+- If it points to a single file, only that file will be accessible.
+- If it points to a directory, all files in that directory will be accessible to the WebView.
+
+Example loading a single file:
+
+```swift
+var fileURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
+fileURL = fileURL.appendingPathComponent("index.html")
+wkWebView.loadFileURL(fileURL, allowingReadAccessTo: fileURL)
+```
+
+Example granting access to a directory:
+
+```swift
+var dirURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
+var fileURL = dirURL.appendingPathComponent("index.html")
+wkWebView.loadFileURL(fileURL, allowingReadAccessTo: dirURL) // All files in dirURL are accessible
+```
+
 ## Safari Web Inspector
 
 Enabling the [Safari Web Inspector](https://developer.apple.com/library/archive/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/GettingStarted/GettingStarted.html) on iOS allows you to remotely [inspect the contents of a WebView from a macOS device](https://developer.apple.com/documentation/safari-developer-tools/inspecting-ios). This is particularly useful in applications that expose native APIs using a JavaScript bridge, such as hybrid applications.
