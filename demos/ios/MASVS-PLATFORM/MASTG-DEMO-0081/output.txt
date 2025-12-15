@@ -1,0 +1,14 @@
+=== Searching for WKWebView references ===
+1234 0x00012abc 8 (4.__TEXT.__cstring) ascii WKWebView
+
+=== Searching for setValue:forKey: references ===
+2345 0x00023def 15 (4.__TEXT.__objc_methname) ascii setValue:forKey:
+
+=== Searching for allowFileAccessFromFileURLs ===
+3456 0x00034abc 27 (4.__TEXT.__cstring) ascii allowFileAccessFromFileURLs
+
+=== Searching for allowUniversalAccessFromFileURLs ===
+4567 0x00045def 33 (4.__TEXT.__cstring) ascii allowUniversalAccessFromFileURLs
+
+=== Searching for loadFileURL references ===
+5678 0x00056abc 37 (4.__TEXT.__objc_methname) ascii loadFileURL:allowingReadAccessToURL:

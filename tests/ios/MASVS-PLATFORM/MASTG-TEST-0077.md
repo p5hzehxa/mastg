@@ -11,7 +11,7 @@ masvs_v1_levels:
 profiles: [L1, L2]
 status: deprecated
 covered_by: [MASTG-TEST-0318, MASTG-TEST-0319]
-deprecation_note: "This test has been split into multiple atomic v2 tests. For WebView file access testing, use MASTG-TEST-0318 (static) and MASTG-TEST-0319 (dynamic)."
+deprecation_note: New version available in MASTG V2
 ---
 
 ## Overview

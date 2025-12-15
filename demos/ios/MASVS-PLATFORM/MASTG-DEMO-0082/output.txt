@@ -1,0 +1,10 @@
+[*] Starting WKWebView file access monitor...
+[*] Script loaded. Waiting for WebView instances...
+
+[+] Found WKWebView instance: <WKWebView: 0x10e820000; frame = (0 0; 390 844); layer = <CALayer: 0x600003a8c0a0>>
+    URL: file:///var/mobile/Containers/Data/Application/ABC123.../Documents/index.html
+    javaScriptEnabled: true
+    allowFileAccessFromFileURLs: 1
+    allowUniversalAccessFromFileURLs: 1
+
+[*] WKWebView enumeration complete
