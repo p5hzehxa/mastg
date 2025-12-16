@@ -1,7 +1,7 @@
 ---
 platform: android
 title: SafeBrowsing Disabled in AndroidManifest
-id: MASTG-TEST-0314
+id: MASTG-TEST-03x2
 apis: [WebView, EnableSafeBrowsing]
 type: [static]
 weakness: MASWE-0071

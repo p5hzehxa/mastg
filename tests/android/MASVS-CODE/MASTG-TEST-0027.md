@@ -10,7 +10,7 @@ masvs_v1_levels:
 - L2
 profiles: [L1, L2]
 status: deprecated
-covered_by: [MASTG-TEST-0313, MASTG-TEST-0314, MASTG-TEST-0315]
+covered_by: [MASTG-TEST-03x1, MASTG-TEST-03x2, MASTG-TEST-03x3]
 deprecation_note: "New version available in MASTG V2"
 ---
 

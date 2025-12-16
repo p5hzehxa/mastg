@@ -1,0 +1,26 @@
+[*] Hooking WebViewClient methods...
+[*] WebViewClient hooks installed successfully
+
+[shouldOverrideUrlLoading] URL: https://mas.owasp.org/
+[shouldOverrideUrlLoading] Return value: false (false = load URL, true = block URL)
+  Scheme: https
+  Host: mas.owasp.org
+  Path: /
+[Uri.getScheme] https
+[Uri.getHost] mas.owasp.org
+[Uri.getPath] /
+
+[shouldInterceptRequest] URL: https://mas.owasp.org/
+[shouldInterceptRequest] Default loading behavior
+
+[shouldOverrideUrlLoading] URL: https://mas.owasp.org/MASTG/
+[shouldOverrideUrlLoading] Return value: false (false = load URL, true = block URL)
+  Scheme: https
+  Host: mas.owasp.org
+  Path: /MASTG/
+[Uri.getScheme] https
+[Uri.getHost] mas.owasp.org
+[Uri.getPath] /MASTG/
+
+[shouldInterceptRequest] URL: https://mas.owasp.org/MASTG/
+[shouldInterceptRequest] Default loading behavior

@@ -1,9 +1,9 @@
 ---
 platform: android
 title: Uses of WebViewClient URL Loading Handlers with semgrep
-id: MASTG-DEMO-0077
+id: MASTG-DEMO-03x2
 code: [kotlin, java]
-test: MASTG-TEST-0313
+test: MASTG-TEST-03x1
 ---
 
 ## Sample
