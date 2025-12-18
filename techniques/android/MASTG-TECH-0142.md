@@ -25,7 +25,7 @@ To retrieve the Data Safety section, you need:
 - Internet access to the Google Play Store
 - One of the following:
     - A web browser
-    - @MASTG-TOOL-0141 (google-play-scraper) for automated retrieval
+    - @MASTG-TOOL-0145 (google-play-scraper) for automated retrieval
 
 ## Steps
 
@@ -51,7 +51,7 @@ https://play.google.com/store/apps/datasafety?id=com.google.android.youtube
 
 1. Take screenshots or save the information for comparison with actual app behavior during testing.
 
-### Using @MASTG-TOOL-0141
+### Using @MASTG-TOOL-0145
 
 1. Install google-play-scraper:
 

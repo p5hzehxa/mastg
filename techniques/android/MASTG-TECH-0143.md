@@ -23,7 +23,7 @@ The privacy policy URL can be found through the app's Google Play listing (if av
 - Internet access
 - One of the following:
     - A web browser
-    - @MASTG-TOOL-0141 (google-play-scraper) for automated retrieval of Google Play apps
+    - @MASTG-TOOL-0145 (google-play-scraper) for automated retrieval of Google Play apps
     - Access to the installed app to find in-app privacy policy links
     - @MASTG-TOOL-0005 (apktool) or similar tool for extracting app resources
 
@@ -50,7 +50,7 @@ https://play.google.com/store/apps/details?id=com.google.android.youtube
 1. Click the link to access the privacy policy
 1. Review and save the privacy policy for reference during testing
 
-#### Using @MASTG-TOOL-0141
+#### Using @MASTG-TOOL-0145
 
 1. Install google-play-scraper:
 
