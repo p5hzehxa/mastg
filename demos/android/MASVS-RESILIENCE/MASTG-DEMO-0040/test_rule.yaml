@@ -1,0 +1,6 @@
+rules:
+  - id: test-file-check
+    severity: INFO
+    languages: [java]
+    message: "File check"
+    pattern: new File($X).exists()
