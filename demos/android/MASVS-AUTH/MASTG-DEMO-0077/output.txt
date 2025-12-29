@@ -1,0 +1,11 @@
+Scanning 1 file.
+
+Findings:
+
+  MastgTest_reversed.java
+     mastg-android-biometric-no-confirmation-required
+        [MASVS-AUTH] BiometricPrompt allows authentication without explicit user confirmation. For sensitive operations, consider using setConfirmationRequired(true).
+
+         25┆ .setConfirmationRequired(false)
+
+Ran 1 rule on 1 file: 1 finding.
