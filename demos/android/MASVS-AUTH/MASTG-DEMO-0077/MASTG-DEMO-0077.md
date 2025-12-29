@@ -10,7 +10,9 @@ test: MASTG-TEST-0316
 
 This sample demonstrates the use of `BiometricPrompt.PromptInfo.Builder` with `setConfirmationRequired()` method. It shows both insecure configurations that allow implicit authentication without explicit user action and secure configurations that require explicit confirmation.
 
-When `setConfirmationRequired(false)` is used, passive biometrics (like face recognition) can authenticate the user as soon as the device detects their biometric data, without requiring them to tap a confirmation button. According to the [Android documentation](https://developer.android.com/identity/sign-in/biometric-auth#no-explicit-user-action): "A false value for `setConfirmationRequired()` is intended to be used in cases where the user's intent is obvious, such as autofilling a password. In cases where security is more important, such as making a purchase, set this value to true."
+When `setConfirmationRequired(false)` is used, passive biometrics (like face recognition) can authenticate the user as soon as the device detects their biometric data, without requiring them to tap a confirmation button.
+
+According to the [Android documentation](https://developer.android.com/identity/sign-in/biometric-auth#no-explicit-user-action): "A false value for `setConfirmationRequired()` is intended to be used in cases where the user's intent is obvious, such as autofilling a password. In cases where security is more important, such as making a purchase, set this value to true."
 
 {{ MastgTest.kt # MastgTest_reversed.java }}
 
