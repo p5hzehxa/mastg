@@ -12,11 +12,13 @@ profiles: [L2]
 
 This test checks if the app uses biometric authentication mechanisms that allow fallback to device credentials (PIN, pattern, or password) for sensitive operations. On Android, the [`BiometricPrompt`](https://developer.android.com/reference/androidx/biometric/BiometricPrompt) API can be configured to accept different types of authenticators via [`setAllowedAuthenticators`](https://developer.android.com/reference/androidx/biometric/BiometricPrompt.PromptInfo.Builder#setAllowedAuthenticators(int)) in [`BiometricPrompt.PromptInfo.Builder`](https://developer.android.com/reference/androidx/biometric/BiometricPrompt.PromptInfo.Builder).
 
-The following authenticator types are available in [`BiometricManager.Authenticators`](https://developer.android.com/reference/androidx/biometric/BiometricManager.Authenticators):
+The following authenticator types are available in [`BiometricManager.Authenticators`](https://developer.android.com/reference/androidx/biometric/BiometricManager.Authenticators#constants_1):
 
-- `BIOMETRIC_STRONG`: Class 3 biometric authentication (e.g., fingerprint, face)
+- `BIOMETRIC_STRONG`: Class 3 biometric authentication
 - `BIOMETRIC_WEAK`: Class 2 biometric authentication
-- `DEVICE_CREDENTIAL`: Device credentials (PIN, pattern, password)
+- `DEVICE_CREDENTIAL`: The non-biometric credential used to secure the device (i.e. PIN, pattern, or password).
+
+The [biometric classes](https://source.android.com/docs/security/features/biometric/measure#biometric-classes) are based on their spoof and imposter acceptance rates.
 
 When `DEVICE_CREDENTIAL` is included (either alone or combined with biometric authenticators using the bitwise OR operator `|`), the authentication allows fallback to device credentials, which is considered weaker than requiring biometrics alone because passcodes are more susceptible to compromise (e.g., through shoulder surfing).
 
@@ -28,12 +30,12 @@ Similarly, using [`setDeviceCredentialAllowed(true)`](https://developer.android.
 
 ## Observation
 
-The output should contain a list of locations where biometric authentication is configured with fallback to device credentials.
+The output should contain a list of locations where biometric authentication has been configured, with the option of using device credentials as a fallback.
 
 ## Evaluation
 
 The test fails if the app uses `BiometricPrompt` with authenticators that include `DEVICE_CREDENTIAL` for any sensitive data resource that needs protection.
 
-The test passes only if the app uses `BiometricPrompt` with `BIOMETRIC_STRONG` only (without `DEVICE_CREDENTIAL`) to enforce biometric-only access for any sensitive data resource that needs protection.
+The test passes only if the app uses `BiometricPrompt` with `BIOMETRIC_STRONG` (without `DEVICE_CREDENTIAL`) to enforce biometric-only access for any sensitive data resource that needs protection.
 
 **Note:** Using `DEVICE_CREDENTIAL` is not inherently a vulnerability, but in high-security applications (e.g., finance, government, health), its use can represent a weakness that reduces the intended security posture. This issue is better categorized as a security weakness or hardening issue, not a critical vulnerability.

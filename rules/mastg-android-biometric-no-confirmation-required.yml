@@ -5,6 +5,6 @@ rules:
     severity: WARNING
     metadata:
       summary: This rule detects BiometricPrompt configurations that disable explicit user confirmation.
-    message: "[MASVS-AUTH] BiometricPrompt allows authentication without explicit user confirmation. For sensitive operations, consider using setConfirmationRequired(true)."
+    message: "[MASVS-AUTH-3] BiometricPrompt allows authentication without explicit user confirmation. For sensitive operations, consider using setConfirmationRequired(true)."
     pattern: |
       $BUILDER.setConfirmationRequired(false)

@@ -1,0 +1,16 @@
+rules:
+  - id: mastg-android-biometric-event-bound
+    languages:
+      - java
+      - kotlin
+    severity: WARNING
+    metadata:
+      summary: This rule detects uses of BiometricPrompt.authenticate without a CryptoObject (event-bound biometric authentication).
+    message: "[MASVS-AUTH-2] BiometricPrompt.authenticate called without a CryptoObject. Use authenticate(PromptInfo, CryptoObject) with a keystore-backed key (setUserAuthenticationRequired) for sensitive operations."
+    
+    pattern: |
+          $INSTANCE.authenticate($PROMPT_INFO)
+
+    # Exclude calls where a CryptoObject is passed as a second parameter
+    pattern-not: |
+      $ANY.authenticate($PROMPT_INFO, $CRYPTO_OBJECT)

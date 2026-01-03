@@ -1,39 +1,35 @@
 ---
 platform: android
-title: Uses of BiometricPrompt without Explicit User Confirmation with semgrep
+title: References to APIs for Event-Bound Biometric Authentication
 id: MASTG-DEMO-0077
 code: [kotlin]
-test: MASTG-TEST-0316
+test: MASTG-TEST-0314
 ---
 
 ### Sample
 
-This sample demonstrates the use of `BiometricPrompt.PromptInfo.Builder` with `setConfirmationRequired()` method. It shows both insecure configurations that allow implicit authentication without explicit user action and secure configurations that require explicit confirmation.
+This sample demonstrates the use of the `BiometricPrompt` API in an event-bound manner (without a `CryptoObject`) and a crypto-bound manner (with a `CryptoObject`) to implement biometric authentication.
 
-When `setConfirmationRequired(false)` is used, passive biometrics (like face recognition) can authenticate the user as soon as the device detects their biometric data, without requiring them to tap a confirmation button.
+This demo uses the same sample as @MASTG-DEMO-0076.
 
-According to the [Android documentation](https://developer.android.com/identity/sign-in/biometric-auth#no-explicit-user-action): "A false value for `setConfirmationRequired()` is intended to be used in cases where the user's intent is obvious, such as autofilling a password. In cases where security is more important, such as making a purchase, set this value to true."
-
-{{ MastgTest.kt # MastgTest_reversed.java }}
+{{ ../MASTG-DEMO-0076/MastgTest.kt # ../MASTG-DEMO-0076/MastgTest_reversed.java }}
 
 ### Steps
 
 Let's run @MASTG-TOOL-0110 rules against the sample code.
 
-{{ ../../../../rules/mastg-android-biometric-no-confirmation-required.yml }}
+{{ ../../../../rules/mastg-android-biometric-event-bound.yml }}
 
 {{ run.sh }}
 
 ### Observation
 
-The output shows the usage of API that configures biometric authentication without requiring explicit user confirmation.
+The output shows all usages of `BiometricPrompt.authenticate()` and indicates whether a `CryptoObject` is used.
 
 {{ output.txt }}
 
 ### Evaluation
 
-The test fails because the output shows a reference to biometric authentication configuration that disables explicit user confirmation:
+The test fails if sensitive operations use `BiometricPrompt.authenticate(PromptInfo)` without a `CryptoObject`, or if there is no evidence of keys generated with `setUserAuthenticationRequired(true)` being used in conjunction with biometric authentication.
 
-- Line 25: `setConfirmationRequired(false)` is called, which allows the authentication to succeed implicitly without the user actively confirming the action. This is used in the context of authorizing a payment, which is a sensitive operation.
-
-For sensitive operations like payments or data access, the app should use `setConfirmationRequired(true)` (line 36) or rely on the default behavior (line 46) to ensure the user explicitly confirms the authentication. For low-risk operations like password autofill where the user's intent is clear, using `setConfirmationRequired(false)` may be appropriate.
+The test passes if the app uses `BiometricPrompt.authenticate(PromptInfo, CryptoObject)` for sensitive operations with keys stored in the Android KeyStore configured with `setUserAuthenticationRequired(true)`.

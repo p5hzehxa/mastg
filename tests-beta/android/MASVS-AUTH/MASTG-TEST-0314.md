@@ -37,3 +37,5 @@ The test fails if for each sensitive operation worth protecting:
 - There are no calls to key generation with `setUserAuthenticationRequired(true)` in conjunction with biometric authentication.
 
 The test passes if the app uses `BiometricPrompt.authenticate(PromptInfo, CryptoObject)` with properly configured cryptographic keys from the Android KeyStore for sensitive operations.
+
+> Note: It is possible to set the duration in seconds and the authorization type for which a key can be used after successful user authentication by using the method [setUserAuthenticationParameters](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setUserAuthenticationParameters(int,%20int)). However, when using `CryptoObject`, this method has no impact as the biometric prompt is triggered every time `BiometricPrompt.authenticate(PromptInfo, CryptoObject)` is called.
