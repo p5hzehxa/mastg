@@ -1,7 +1,7 @@
 ---
 platform: android
 title: Uses of setInvalidatedByBiometricEnrollment with semgrep
-id: MASTG-DEMO-0078
+id: MASTG-DEMO-0084
 code: [kotlin]
 test: MASTG-TEST-0315
 ---
@@ -10,7 +10,7 @@ test: MASTG-TEST-0315
 
 This sample demonstrates the insecure use of [`setInvalidatedByBiometricEnrollment(false)`](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setInvalidatedByBiometricEnrollment(boolean)) when generating cryptographic keys for biometric authentication.
 
-{{ ../MASTG-DEMO-0076/MastgTest.kt # ../MASTG-DEMO-0076/MastgTest_reversed.java }}
+{{ ../MASTG-DEMO-0082/MastgTest.kt # ../MASTG-DEMO-0082/MastgTest_reversed.java }}
 
 ### Steps
 

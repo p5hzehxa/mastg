@@ -1,7 +1,7 @@
 ---
 platform: android
 title: Uses of BiometricPrompt without Explicit User Confirmation with semgrep
-id: MASTG-DEMO-0079
+id: MASTG-DEMO-0085
 code: [kotlin]
 test: MASTG-TEST-0316
 ---
@@ -12,7 +12,7 @@ This sample demonstrates the use of `BiometricPrompt.PromptInfo.Builder` with `s
 
 When `setConfirmationRequired(false)` is used, passive biometrics (like face recognition) can authenticate the user as soon as the device detects their biometric data, without requiring them to tap a confirmation button.
 
-{{ ../MASTG-DEMO-0076/MastgTest.kt # ../MASTG-DEMO-0076/MastgTest_reversed.java }}
+{{ ../MASTG-DEMO-0082/MastgTest.kt # ../MASTG-DEMO-0082/MastgTest_reversed.java }}
 
 ### Steps
 

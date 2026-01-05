@@ -1,18 +1,18 @@
 ---
 platform: android
 title: Uses of BiometricPrompt with Event-Bound Authentication with semgrep
-id: MASTG-DEMO-0077
+id: MASTG-DEMO-0083
 code: [kotlin]
 test: MASTG-TEST-0314
 ---
 
 ### Sample
 
-This sample demonstrates the use of the `BiometricPrompt` API without a `CryptoObject` for event-bound biometric authentication, which is weaker than crypto-bound authentication (with a `CryptoObject`) as it can be bypassed. 
+This sample demonstrates the use of the `BiometricPrompt` API without a `CryptoObject` for event-bound biometric authentication, which is weaker than crypto-bound authentication (with a `CryptoObject`) as it can be bypassed.
 
 The key being generated and used with `CryptoObject` has set [`.setUserAuthenticationRequired(false)`](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setUserAuthenticationRequired(boolean)) which means the key is authorized to be used regardless of whether the user has been authenticated or not.
 
-{{ ../MASTG-DEMO-0076/MastgTest.kt # ../MASTG-DEMO-0076/MastgTest_reversed.java }}
+{{ ../MASTG-DEMO-0082/MastgTest.kt # ../MASTG-DEMO-0082/MastgTest_reversed.java }}
 
 ### Steps
 
