@@ -1,6 +1,6 @@
 ---
 platform: android
-title: References to APIs for Event-Bound Biometric Authentication
+title: Uses of BiometricPrompt with Event-Bound Authentication with semgrep
 id: MASTG-DEMO-0077
 code: [kotlin]
 test: MASTG-TEST-0314
@@ -8,9 +8,9 @@ test: MASTG-TEST-0314
 
 ### Sample
 
-This sample demonstrates the use of the `BiometricPrompt` API in an event-bound manner (without a `CryptoObject`) and a crypto-bound manner (with a `CryptoObject`) to implement biometric authentication.
+This sample demonstrates the use of the `BiometricPrompt` API without a `CryptoObject` for event-bound biometric authentication, which is weaker than crypto-bound authentication (with a `CryptoObject`) as it can be bypassed. 
 
-This demo uses the same sample as @MASTG-DEMO-0076.
+The key being generated and used with `CryptoObject` has set [`.setUserAuthenticationRequired(false)`](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setUserAuthenticationRequired(boolean)) which means the key is authorized to be used regardless of whether the user has been authenticated or not.
 
 {{ ../MASTG-DEMO-0076/MastgTest.kt # ../MASTG-DEMO-0076/MastgTest_reversed.java }}
 
@@ -24,12 +24,15 @@ Let's run @MASTG-TOOL-0110 rules against the sample code.
 
 ### Observation
 
-The output shows all usages of `BiometricPrompt.authenticate()` and indicates whether a `CryptoObject` is used.
+The output shows the usage of `BiometricPrompt.authenticate()` without using `CryptoObject` and `.setUserAuthenticationRequired(false)`.
 
 {{ output.txt }}
 
 ### Evaluation
 
-The test fails if sensitive operations use `BiometricPrompt.authenticate(PromptInfo)` without a `CryptoObject`, or if there is no evidence of keys generated with `setUserAuthenticationRequired(true)` being used in conjunction with biometric authentication.
+The test fails because the output shows both:
 
-The test passes if the app uses `BiometricPrompt.authenticate(PromptInfo, CryptoObject)` for sensitive operations with keys stored in the Android KeyStore configured with `setUserAuthenticationRequired(true)`.
+- Line 76: `BiometricPrompt.authenticate(PromptInfo)` is used without a `CryptoObject` and
+- Line 192 `setUserAuthenticationRequired(false)` is set for key generation.
+
+For sensitive operations, the app should use `CryptoObject` when doing biometric authentication and the key generated should have `setUserAuthenticationRequired(true)` set.

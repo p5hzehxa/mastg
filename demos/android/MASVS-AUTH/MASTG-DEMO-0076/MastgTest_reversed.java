@@ -123,6 +123,7 @@ public final class MastgTest {
                     StringBuilder sb4;
                     StringBuilder sb5;
                     StringBuilder sb6;
+                    StringBuilder sb7;
                     Intrinsics.checkNotNullParameter(result, "result");
                     try {
                         BiometricPrompt.CryptoObject cryptoObject = result.getCryptoObject();
@@ -137,11 +138,13 @@ public final class MastgTest {
                                 sb3 = MastgTest.this.results;
                                 sb3.append("🔓 DECRYPTION - Success!\n");
                                 sb4 = MastgTest.this.results;
-                                sb4.append("✓  Token decrypted: " + decryptedToken + "\n");
+                                sb4.append("⚠️  Confirmation not required\n");
                                 sb5 = MastgTest.this.results;
-                                sb5.append("✓  Original token: MySecretToken123\n");
+                                sb5.append("✓  Token decrypted: " + decryptedToken + "\n");
                                 sb6 = MastgTest.this.results;
-                                sb6.append("✓  Match: " + Intrinsics.areEqual(decryptedToken, "MySecretToken123") + "\n");
+                                sb6.append("✓  Original token: MySecretToken123\n");
+                                sb7 = MastgTest.this.results;
+                                sb7.append("✓  Match: " + Intrinsics.areEqual(decryptedToken, "MySecretToken123") + "\n");
                                 MastgTest.this.updateUI();
                                 return;
                             }
@@ -186,7 +189,7 @@ public final class MastgTest {
 
     private final SecretKey generateSecretKey() {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES", "AndroidKeyStore");
-        KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(KEY_NAME, 3).setBlockModes("CBC").setEncryptionPaddings("PKCS7Padding").setUserAuthenticationRequired(true).setInvalidatedByBiometricEnrollment(false).build();
+        KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(KEY_NAME, 3).setBlockModes("CBC").setEncryptionPaddings("PKCS7Padding").setUserAuthenticationRequired(false).setUserAuthenticationValidityDurationSeconds(86400).setInvalidatedByBiometricEnrollment(false).setUserAuthenticationParameters(86400, 3).build();
         Intrinsics.checkNotNullExpressionValue(keyGenParameterSpec, "build(...)");
         keyGenerator.init(keyGenParameterSpec);
         SecretKey generateKey = keyGenerator.generateKey();

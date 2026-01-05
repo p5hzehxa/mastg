@@ -12,7 +12,7 @@ This sample demonstrates the use of `BiometricPrompt.PromptInfo.Builder` with `s
 
 When `setConfirmationRequired(false)` is used, passive biometrics (like face recognition) can authenticate the user as soon as the device detects their biometric data, without requiring them to tap a confirmation button.
 
-{{ MastgTest.kt # MastgTest_reversed.java }}
+{{ ../MASTG-DEMO-0076/MastgTest.kt # ../MASTG-DEMO-0076/MastgTest_reversed.java }}
 
 ### Steps
 
@@ -30,8 +30,8 @@ The output shows the usage of API that configures biometric authentication witho
 
 ### Evaluation
 
-The test fails because the output shows a reference to biometric authentication configuration that disables explicit user confirmation:
+The test fails because the output shows two references to biometric authentication configuration that disables explicitly user confirmation:
 
-- Line 25: `setConfirmationRequired(false)` is called, which allows the authentication to succeed implicitly without the user actively confirming the action. This is used in the context of authorizing a payment, which is a sensitive operation.
+- Line 90 and 181: `setConfirmationRequired(false)` is called, which allows the authentication to succeed implicitly without the user actively confirming the action.
 
-For sensitive operations like payments or data access, the app should use `setConfirmationRequired(true)` (line 36) or rely on the default behavior (line 46) to [ensure the user explicitly confirms the authentication](https://developer.android.com/identity/sign-in/biometric-auth#no-explicit-user-action. For low-risk operations like password autofill where the user's intent is clear, using `setConfirmationRequired(false)` may be appropriate.
+For sensitive operations like payments or data access, the app should use `setConfirmationRequired(true)` or rely on the default behavior to [ensure the user explicitly confirms the authentication](https://developer.android.com/identity/sign-in/biometric-auth#no-explicit-user-action. For low-risk operations like password autofill where the user's intent is clear, using `setConfirmationRequired(false)` may be appropriate.

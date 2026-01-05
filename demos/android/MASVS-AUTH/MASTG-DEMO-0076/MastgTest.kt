@@ -217,6 +217,7 @@ class MastgTest (private val context: Context){
                                 val decryptedToken = String(decryptedBytes)
 
                                 results.append("🔓 DECRYPTION - Success!\n")
+                                results.append("⚠️  Confirmation not required\n")
                                 results.append("✓  Token decrypted: $decryptedToken\n")
                                 results.append("✓  Original token: $SECRET_TOKEN\n")
                                 results.append("✓  Match: ${decryptedToken == SECRET_TOKEN}\n")
@@ -274,8 +275,11 @@ class MastgTest (private val context: Context){
         )
             .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-            .setUserAuthenticationRequired(true)
+            .setUserAuthenticationRequired(false)
+            .setUserAuthenticationValidityDurationSeconds(86400)
             .setInvalidatedByBiometricEnrollment(false)
+            .setUserAuthenticationParameters(86400,KeyProperties.AUTH_BIOMETRIC_STRONG or
+                    KeyProperties.AUTH_DEVICE_CREDENTIAL)
             .build()
 
         keyGenerator.init(keyGenParameterSpec)

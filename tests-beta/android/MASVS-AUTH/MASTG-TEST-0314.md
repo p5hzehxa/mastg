@@ -18,24 +18,21 @@ On Android, [`BiometricPrompt.authenticate()`](https://developer.android.com/ref
 
 - **With CryptoObject** (crypto-bound): The app passes a cryptographic object (e.g., `Cipher`, `Signature`, `Mac`) that requires user authentication. The cryptographic operation can only succeed after genuine biometric authentication, making bypass significantly harder.
 
-The recommended approach is to use `BiometricPrompt.authenticate(PromptInfo, CryptoObject)` with a key stored in the Android KeyStore that has `setUserAuthenticationRequired(true)`. This ensures that the key can only be used after successful biometric authentication, binding the authentication to a cryptographic operation.
-
 ## Steps
 
 1. Run @MASTG-TECH-0014 with a tool such as @MASTG-TOOL-0110 on the app binary to look for uses of `BiometricPrompt.authenticate()`.
 2. Analyze whether the calls include a `CryptoObject` parameter.
+3. Analyze whether `setUserAuthenticationRequired(true)` is set when generating the key.
 
 ## Observation
 
-The output should contain a list of locations where `BiometricPrompt.authenticate()` is called, indicating whether a `CryptoObject` is passed.
+The output should contain a list of locations where `BiometricPrompt.authenticate()` is called, indicating whether a `CryptoObject` is passed and if `setUserAuthenticationRequired(true)` is set.
 
 ## Evaluation
 
-The test fails if for each sensitive operation worth protecting:
+The test fails for each sensitive operation worth protecting if:
 
 - `BiometricPrompt.authenticate(PromptInfo)` is used without a `CryptoObject`.
-- There are no calls to key generation with `setUserAuthenticationRequired(true)` in conjunction with biometric authentication.
+- There are no calls to key generation with `setUserAuthenticationRequired(true)` in conjunction with biometric authentication, as by default, the key is authorized to be used regardless of whether the user has been authenticated or not.
 
-The test passes if the app uses `BiometricPrompt.authenticate(PromptInfo, CryptoObject)` with properly configured cryptographic keys from the Android KeyStore for sensitive operations.
-
-> Note: It is possible to set the duration in seconds and the authorization type for which a key can be used after successful user authentication by using the method [setUserAuthenticationParameters](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setUserAuthenticationParameters(int,%20int)). However, when using `CryptoObject`, this method has no impact as the biometric prompt is triggered every time `BiometricPrompt.authenticate(PromptInfo, CryptoObject)` is called.
+The test passes if the app uses `BiometricPrompt.authenticate(PromptInfo, CryptoObject)` with properly configured cryptographic keys from the Android KeyStore for sensitive operations and uses for key generation `.setUserAuthenticationRequired(true)`. This ensures that the key can only be used after successful biometric authentication, binding the authentication to a cryptographic operation.

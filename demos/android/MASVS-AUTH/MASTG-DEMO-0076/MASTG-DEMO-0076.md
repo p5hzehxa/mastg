@@ -8,9 +8,9 @@ test: MASTG-TEST-0313
 
 ### Sample
 
-This sample demonstrates the use of the `BiometricPrompt` API with different authenticator configurations. It shows both weaker configurations that allow fallback to device credentials (PIN, pattern, password), which are more susceptible to compromise (e.g., through shoulder surfing) and secure configurations that requires a strong biometric authentication only. 
+This sample demonstrates the use of the `BiometricPrompt` API with different authenticator configurations used in `BiometricPrompt.PromptInfo.Builder()`. It shows both weaker configurations that allow fallback to device credentials (PIN, pattern, password), which are more susceptible to compromise (e.g., through shoulder surfing) and secure configurations that requires a strong biometric authentication only. 
 
-Note that when using biometric authentication on Android, the user must have a PIN, pattern, or password set on the device as stated in the [Android documentation](https://developer.android.com/identity/sign-in/biometric-auth#declare-supported-authentication-types).
+> Note: The app will be in an inconsistent behavior when authenticating with biometrics and may only work as expected on the 1st attempt. Afterwards it will fail for the CryptoObject biometric authentication as the key is not expecting an authentication due to the usage of `.setUserAuthenticationRequired(false)` but the biometric auth is always triggered when `cipher.init()` is called. If it falls it prompts for authentication via fingerprint as a fallback.
 
 {{ MastgTest.kt # MastgTest_reversed.java }}
 
@@ -24,7 +24,7 @@ Let's run @MASTG-TOOL-0110 rules against the sample code.
 
 ### Observation
 
-The output shows all usages of APIs that configure biometric authentication with fallback to device credentials.
+The output shows all usages of APIs that configure biometric authentication.
 
 {{ output.txt }}
 
@@ -32,6 +32,14 @@ The output shows all usages of APIs that configure biometric authentication with
 
 The test fails because the output shows references to biometric authentication configurations that allow fallback to device credentials:
 
-- Line 74: `setAllowedAuthenticators` is called with `BIOMETRIC_STRONG | DEVICE_CREDENTIAL`, which allows the user to authenticate with either biometrics or their device PIN/pattern/password.
+- Line 74: `setAllowedAuthenticators(32783)` is called with `BIOMETRIC_STRONG | DEVICE_CREDENTIAL`, which allows the user to authenticate with either biometrics or their device PIN/pattern/password. 
 
-For sensitive operations, the app should use `BIOMETRIC_STRONG` to enforce biometric-only authentication. Note that when using `BIOMETRIC_STRONG` alone, you must also call `setNegativeButtonText()` to provide a cancel option for the user.
+The value `32783` is the sum of `32768` and `15`. Decompiled code contains integer values instead of the constants for biometric authentication:
+
+- BIOMETRIC_STRONG = 15 (0x000F)
+- BIOMETRIC_WEAK = 255 (0x00FF)
+- DEVICE_CREDENTIAL = 32768 (0x8000)
+
+- Also in Line 74: [`setDeviceCredentialAllowed(true)`](https://developer.android.com/reference/androidx/biometric/BiometricPrompt.PromptInfo.Builder#setDeviceCredentialAllowed(boolean)) is called and can give the user the option to authenticate with their device PIN, pattern, or password instead of a biometric.
+
+For sensitive operations, the app should use [`BIOMETRIC_STRONG`](https://developer.android.com/identity/sign-in/biometric-auth#declare-supported-authentication-types) to enforce biometric-only authentication.
