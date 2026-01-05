@@ -3,7 +3,7 @@ platform: android
 title: Uses of setInvalidatedByBiometricEnrollment with semgrep
 id: MASTG-DEMO-0084
 code: [kotlin]
-test: MASTG-TEST-0315
+test: MASTG-TEST-0322
 ---
 
 ### Sample

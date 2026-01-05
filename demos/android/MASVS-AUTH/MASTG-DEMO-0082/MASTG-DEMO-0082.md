@@ -3,12 +3,12 @@ platform: android
 title: Uses of BiometricPrompt with Device Credential Fallback with semgrep
 id: MASTG-DEMO-0082
 code: [kotlin]
-test: MASTG-TEST-0313
+test: MASTG-TEST-0320
 ---
 
 ### Sample
 
-This sample demonstrates the use of the `BiometricPrompt` API with different authenticator configurations used in `BiometricPrompt.PromptInfo.Builder()`. It shows both weaker configurations that allow fallback to device credentials (PIN, pattern, password), which are more susceptible to compromise (e.g., through shoulder surfing) and secure configurations that requires a strong biometric authentication only. 
+This sample demonstrates the use of the `BiometricPrompt` API with different authenticator configurations used in `BiometricPrompt.PromptInfo.Builder()`. It shows both weaker configurations that allow fallback to device credentials (PIN, pattern, password), which are more susceptible to compromise (e.g., through shoulder surfing) and secure configurations that requires a strong biometric authentication only.
 
 > Note: The app will be in an inconsistent behavior when authenticating with biometrics and may only work as expected on the 1st attempt. Afterwards it will fail for the CryptoObject biometric authentication as the key is not expecting an authentication due to the usage of `.setUserAuthenticationRequired(false)` but the biometric auth is always triggered when `cipher.init()` is called. If it falls it prompts for authentication via fingerprint as a fallback.
 
@@ -32,7 +32,7 @@ The output shows all usages of APIs that configure biometric authentication.
 
 The test fails because the output shows references to biometric authentication configurations that allow fallback to device credentials:
 
-- Line 74: `setAllowedAuthenticators(32783)` is called with `BIOMETRIC_STRONG | DEVICE_CREDENTIAL`, which allows the user to authenticate with either biometrics or their device PIN/pattern/password. 
+- Line 74: `setAllowedAuthenticators(32783)` is called with `BIOMETRIC_STRONG | DEVICE_CREDENTIAL`, which allows the user to authenticate with either biometrics or their device PIN/pattern/password.
 
 The value `32783` is the sum of `32768` and `15`. Decompiled code contains integer values instead of the constants for biometric authentication:
 

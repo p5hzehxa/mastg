@@ -3,7 +3,7 @@ platform: android
 title: Uses of BiometricPrompt with Event-Bound Authentication with semgrep
 id: MASTG-DEMO-0083
 code: [kotlin]
-test: MASTG-TEST-0314
+test: MASTG-TEST-0321
 ---
 
 ### Sample
