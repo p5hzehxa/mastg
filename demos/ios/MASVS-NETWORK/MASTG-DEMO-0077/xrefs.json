@@ -1,2 +1,0 @@
-[{"from":4268,"type":"STRN","perm":"r--","opcode":"add x0, x0, str.http:__httpbin.org_get","fcn_addr":4256,"fcn_name":"sym.MASTestApp.MastgTest.httpEndpoint_...Z_","realname":"func.000010a0","refname":"str.http:__httpbin.org_get"}]
-[{"from":4468,"type":"STRN","perm":"r--","opcode":"add x0, x0, str.http:__example.com_api","fcn_addr":4456,"fcn_name":"sym.MASTestApp.MastgTest.httpApiUrl_...Z_","realname":"func.00001168","refname":"str.http:__example.com_api"}]

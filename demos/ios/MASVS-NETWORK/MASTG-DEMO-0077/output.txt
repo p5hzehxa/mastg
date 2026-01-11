@@ -1,2 +1,25 @@
-http://httpbin.org/get
-http://example.com/api
+Uses of http:// URLs:
+0   0x00006bd0 0x100006bd0 56  57   2.__TEXT.__cstring       ascii HTTP request to http://httpbin.org/get returned status:
+1   0x00006c10 0x100006c10 47  48   2.__TEXT.__cstring       ascii HTTP request to http://httpbin.org/get failed:
+3   0x00006c60 0x100006c60 22  23   2.__TEXT.__cstring       ascii http://httpbin.org/get
+4   0x00006c80 0x100006c80 36  37   2.__TEXT.__cstring       ascii Invalid URL: http://httpbin.org/get\n
+
+xrefs to http://httpbin.org/get:
+sym.func.100005024 0x100005130 [STRN:r--] add x8, x8, str.http:__httpbin.org_get
+
+Use of http://httpbin.org/get:
+│           0x100005130      add x8, x8, 0xc60                         ; 0x100006c60 ; "http://httpbin.org/get"
+│           0x100005134      sub x27, x8, 0x20
+│           0x100005138      mov x0, x24
+│           0x10000513c      bl sym.imp.swift_retain
+│           0x100005140      mov x0, x23                               ; void *arg0
+│           0x100005144      bl sym.imp.swift_bridgeObjectRetain       ; void *swift_bridgeObjectRetain(void *arg0)
+│           0x100005148      orr x1, x27, 0x8000000000000000
+│           0x10000514c      mov x8, x26
+│           0x100005150      mov x0, 0x16
+│           0x100005154      movk x0, 0xd000, lsl 48
+│           0x100005158      bl sym.imp.Foundation.URL.string_...cfC_  ; Foundation.URL.string(...cfC)
+│           0x10000515c      ldr x8, [x28, 0x30]
+│           0x100005160      mov x0, x26
+│           0x100005164      mov w1, 1
+│           0x100005168      mov x2, x22
