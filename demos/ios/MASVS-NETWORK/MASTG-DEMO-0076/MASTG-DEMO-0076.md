@@ -5,8 +5,6 @@ code: [xml]
 id: MASTG-DEMO-0076
 test: MASTG-TEST-0314
 kind: fail
-status: draft
-note: This demo uses a standalone Info.plist file for demonstration purposes
 ---
 
 ### Sample
@@ -26,10 +24,14 @@ The code snippet below shows an insecure ATS configuration in an `Info.plist` fi
 
 The output shows the ATS configuration found in the `Info.plist` file:
 
-{{ output.txt }}
+{{ output.txt # Info.json }}
 
 ### Evaluation
 
-The test fails because `NSAllowsArbitraryLoads` is set to `true`, which disables ATS globally and allows cleartext HTTP traffic to any domain.
+The test fails because several ATS settings are set to `true`, which disables ATS globally and allows cleartext HTTP traffic to any domain. Specifically, the following settings are misconfigured:
 
-Note that in some cases, apps may legitimately need to disable ATS (e.g., browsers). In such cases, verify that a proper justification string is provided and that the app implements appropriate compensating controls.
+- `NSAllowsArbitraryLoads = true` disables ATS for all network connections.
+- `NSAllowsArbitraryLoadsForLocalNetworking = true` allows cleartext traffic on local networks.
+- `NSAllowsArbitraryLoadsForMedia = true` allows cleartext traffic for media resources.
+- `NSAllowsArbitraryLoadsInWebContent = true` allows cleartext traffic in WebViews.
+- Domain-specific exceptions for `api.example.com` and `cdn.example.net` also allow insecure HTTP loads.

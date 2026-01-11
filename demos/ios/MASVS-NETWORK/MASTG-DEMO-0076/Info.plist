@@ -2,17 +2,64 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleIdentifier</key>
-    <string>org.owasp.mastestapp</string>
-    <key>CFBundleName</key>
-    <string>MASTestApp</string>
-    <key>CFBundleVersion</key>
-    <string>1.0</string>
-    <!-- FAIL: [MASTG-TEST-0314] ATS is disabled globally, allowing cleartext HTTP traffic -->
-    <key>NSAppTransportSecurity</key>
+  <key>CFBundleIdentifier</key>
+  <string>org.owasp.mastestapp</string>
+  <key>CFBundleName</key>
+  <string>MASTestApp</string>
+  <key>CFBundleVersion</key>
+  <string>1.0</string>
+
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <!-- Global cleartext allowance -->
+    <key>NSAllowsArbitraryLoads</key>
+    <true/>
+
+    <!-- More broad allowances -->
+    <key>NSAllowsArbitraryLoadsInWebContent</key>
+    <true/>
+    <key>NSAllowsArbitraryLoadsForMedia</key>
+    <true/>
+    <key>NSAllowsArbitraryLoadsForLocalNetworking</key>
+    <true/>
+
+    <!-- Domain specific exceptions -->
+    <key>NSExceptionDomains</key>
     <dict>
+
+      <key>api.example.com</key>
+      <dict>
+        <!-- Cleartext HTTP allowed for this domain -->
+        <key>NSExceptionAllowsInsecureHTTPLoads</key>
+        <true/>
+        <!-- Weakened TLS requirements -->
+        <key>NSExceptionRequiresForwardSecrecy</key>
+        <false/>
+        <key>NSTemporaryExceptionMinimumTLSVersion</key>
+        <string>TLSv1.0</string>
+        <!-- Applies to subdomains too -->
+        <key>NSIncludesSubdomains</key>
+        <true/>
+      </dict>
+
+      <key>cdn.example.net</key>
+      <dict>
+        <!-- Another cleartext enabling pattern -->
+        <key>NSExceptionAllowsInsecureHTTPLoads</key>
+        <true/>
+        <!-- Explicitly allow arbitrary loads for this domain -->
         <key>NSAllowsArbitraryLoads</key>
         <true/>
+        <!-- Weak cipher and TLS settings -->
+        <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+        <true/>
+        <key>NSTemporaryExceptionMinimumTLSVersion</key>
+        <string>TLSv1.1</string>
+        <key>NSIncludesSubdomains</key>
+        <true/>
+      </dict>
+
     </dict>
+  </dict>
 </dict>
 </plist>
