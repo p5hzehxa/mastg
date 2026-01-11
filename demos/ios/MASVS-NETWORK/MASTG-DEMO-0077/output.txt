@@ -1,7 +1,2 @@
-=== Searching for HTTP URLs in the binary ===
-0x100003f20 hit0_0 "http://httpbin.org/get"
-0x100003f40 hit0_1 "http://example.com/api"
-
-=== Strings containing HTTP URLs ===
-118 0x00003f20 0x100003f20 22 23 (4.__TEXT.__cstring) ascii http://httpbin.org/get
-119 0x00003f40 0x100003f40 22 23 (4.__TEXT.__cstring) ascii http://example.com/api
+http://httpbin.org/get
+http://example.com/api

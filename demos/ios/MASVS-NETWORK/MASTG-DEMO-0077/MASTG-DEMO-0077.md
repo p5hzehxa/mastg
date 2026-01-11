@@ -5,8 +5,6 @@ code: [swift]
 id: MASTG-DEMO-0077
 test: MASTG-TEST-0313
 kind: fail
-status: draft
-note: This demo requires rebuilding MASTestApp with the provided MastgTest.swift code
 ---
 
 ### Sample
@@ -26,9 +24,9 @@ The code snippet below shows sample code that uses hardcoded HTTP URLs:
 
 ### Observation
 
-The output contains a list of HTTP URLs found in the binary:
+The output contains a list of HTTP URLs found in the binary and the cross reference information including the HTTP URLs offsets (`from`) and containing functions (`fcn_addr`, `fcn_name`, `realname`):
 
-{{ output.txt }}
+{{ output.txt # xrefs.json }}
 
 ### Evaluation
 
@@ -36,6 +34,6 @@ The test fails because hardcoded HTTP URLs were found in the binary. The URLs `h
 
 To determine if these URLs are actually used for network communication:
 
-1. Review the code context where these URLs are referenced.
+1. Review the code context where these URLs are referenced. For example, use the `from` offset from the output to locate the surrounding code in the binary (e.g. `s <from>; pd 20` in radare2).
 2. Check if ATS exceptions are configured to allow cleartext traffic (see @MASTG-TEST-0314).
 3. Perform dynamic analysis to observe actual network traffic (see @MASTG-TEST-0236).
