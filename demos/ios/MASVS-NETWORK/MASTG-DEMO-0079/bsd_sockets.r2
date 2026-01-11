@@ -1,24 +1,24 @@
-e scr.color=0
-e scr.interactive=false
+e asm.bytes=false
+e scr.color=false
+e asm.var=false
 
-?e === Searching for BSD socket APIs ===
-afl~socket
-afl~connect
-afl~send
-afl~recv
+?e Uses of the BSD sockets functions:
+ii~getaddrinfo,send,recv,connect,socket
 
 ?e
-?e === Searching for getaddrinfo (hostname resolution) ===
-afl~getaddrinfo
+
+?e xrefs to getaddrinfo:
+axt @ 0x1000069c4
 
 ?e
-?e === Strings referencing socket operations ===
-izz~socket
-izz~SOCK_STREAM
+
+?e Use of getaddrinfo:
+
+# Seek to the function where getaddrinfo is called
+pd-- 20 @ 0x1000041d0
 
 ?e
-?e === Imported symbols for socket operations ===
-ii~socket
-ii~connect
-ii~send
-ii~recv
+
+?e Value passed to getaddrinfo:
+
+? 0x50~uint32[1]
