@@ -5,20 +5,20 @@ code: [swift]
 id: MASTG-DEMO-0078
 test: MASTG-TEST-0315
 kind: fail
-status: draft
-note: This demo requires rebuilding MASTestApp with the provided MastgTest.swift code
 ---
 
 ### Sample
 
-The code snippet below shows sample code that uses the `Network` framework to establish a connection that bypasses ATS:
+The code sample code uses the `Network` framework to establish a connection to `httpbin.org` on port `80`. The demo doesn't send any data over the connection, but for the purposes of this demo, assume that it does.
 
 {{ MastgTest.swift }}
+
+Note that we do not modify ATS so such a connection should be blocked. However, ATS does not apply to the `Network` framework so the connection will succeed.
 
 ### Steps
 
 1. Unzip the app package and locate the main binary file (@MASTG-TECH-0058), which in this case is `./Payload/MASTestApp.app/MASTestApp`.
-2. Run @MASTG-TOOL-0073 with the script to search for low-level networking APIs in the binary.
+2. Run @MASTG-TOOL-0073 with the script to search for low-level networking APIs in the binary. In this case, we'll focus on `NWEndpoint.Port.integerLiteral`, which is used to specify the port number when creating a network endpoint, but you could also look for `NWConnection` and `NWParameters`.
 
 {{ low_level_network.r2 }}
 
@@ -26,16 +26,10 @@ The code snippet below shows sample code that uses the `Network` framework to es
 
 ### Observation
 
-The output contains references to low-level networking APIs found in the binary:
+The output contains references to the `NWEndpoint.Port.integerLiteral` function, including the locations where it is used in the binary and the value passed to it:
 
-{{ output.txt }}
+{{ output.asm }}
 
 ### Evaluation
 
-The test fails because the app uses `NWConnection` from the Network framework without TLS, which bypasses ATS protections and allows cleartext HTTP traffic.
-
-To determine the security impact:
-
-1. Review the code context to understand how the connection is configured (with or without TLS).
-2. Check if the connection is used for sensitive data transmission.
-3. Perform dynamic analysis to observe actual network traffic (see @MASTG-TEST-0236).
+The test fails because the app uses `NWEndpoint.Port.integerLiteral` to specify port `80` for a network connection by loading the value `0x50` (which is `80` in decimal) into register `w0` before calling the function.

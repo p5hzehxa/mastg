@@ -1,21 +1,24 @@
-e scr.color=0
-e scr.interactive=false
+e asm.bytes=false
+e scr.color=false
+e asm.var=false
 
-?e === Searching for Network framework (NWConnection) usage ===
-afl~NWConnection
-
-?e
-?e === Searching for CFNetwork/CFSocket APIs ===
-afl~CFSocket
-afl~CFStream
-afl~CFHTTPStream
+?e Uses of the Network.NWEndpoint.Port.integerLiteral function:
+f~Network.NWEndpoint.Port.integerLiteral
 
 ?e
-?e === Strings referencing Network framework ===
-izz~NWConnection
-izz~NWParameters
-izz~Network.framework
+
+?e xrefs to Network.NWEndpoint.Port.integerLiteral:
+axt @ 0x100006c00
 
 ?e
-?e === Imported symbols from Network framework ===
-ii~Network
+
+?e Use of Network.NWEndpoint.Port.integerLiteral:
+
+# Seek to the function where Network.NWEndpoint.Port.integerLiteral is called
+pd-- 5 @ 0x1000047f4
+
+?e
+
+?e Value passed to Network.NWEndpoint.Port.integerLiteral:
+
+? 0x50~uint32[1]
