@@ -2,7 +2,7 @@
 platform: ios
 title: Insecure ATS Configuration Allowing Cleartext Traffic
 code: [xml]
-id: MASTG-DEMO-0076
+id: MASTG-DEMO-0083
 test: MASTG-TEST-0322
 kind: fail
 ---

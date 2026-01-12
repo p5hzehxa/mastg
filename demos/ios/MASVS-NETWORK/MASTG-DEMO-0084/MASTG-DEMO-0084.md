@@ -2,7 +2,7 @@
 platform: ios
 title: Hardcoded HTTP URLs in iOS Binary
 code: [swift]
-id: MASTG-DEMO-0077
+id: MASTG-DEMO-0084
 test: MASTG-TEST-0321
 kind: fail
 ---
@@ -11,7 +11,7 @@ kind: fail
 
 The code snippet below shows sample code that uses hardcoded HTTP URLs:
 
-{{ ../MASTG-DEMO-0076/MastgTest.swift }}
+{{ ../MASTG-DEMO-0083/MastgTest.swift }}
 
 ### Steps
 
