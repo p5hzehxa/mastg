@@ -3,9 +3,9 @@ import Foundation
 struct MastgTest {
     // SUMMARY: This sample demonstrates the use of hardcoded HTTP URLs in iOS apps.
     
-    static let httpEndpoint = "http://httpbin.org/get"  // FAIL: [MASTG-TEST-0313] Hardcoded HTTP URL
-    static let httpApiUrl = "http://example.com/api"    // FAIL: [MASTG-TEST-0313] Hardcoded HTTP URL
-    static let httpsEndpoint = "https://httpbin.org/get" // PASS: [MASTG-TEST-0313] HTTPS URL
+    static let httpEndpoint = "http://httpbin.org/get"  // FAIL: [MASTG-TEST-0321] Hardcoded HTTP URL
+    static let httpApiUrl = "http://example.com/api"    // FAIL: [MASTG-TEST-0321] Hardcoded HTTP URL
+    static let httpsEndpoint = "https://httpbin.org/get" // PASS: [MASTG-TEST-0321] HTTPS URL
     
     static func mastgTest(completion: @escaping (String) -> Void) {
         var result = "Testing HTTP URL connections:\n\n"

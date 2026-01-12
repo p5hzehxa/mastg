@@ -7,7 +7,7 @@ struct MastgTest {
     static func mastgTest(completion: @escaping (String) -> Void) {
         var result = "Testing Network framework connection (bypasses ATS):\n\n"
         
-        // FAIL: [MASTG-TEST-0315] Using Network framework without TLS bypasses ATS
+        // FAIL: [MASTG-TEST-0322] Using Network framework without TLS bypasses ATS
         let host = NWEndpoint.Host("httpbin.org")
         let port = NWEndpoint.Port(integerLiteral: 80)
         
@@ -49,7 +49,7 @@ struct MastgTest {
         connection.start(queue: .main)
     }
     
-    // PASS: [MASTG-TEST-0315] Using Network framework with TLS is secure
+    // PASS: [MASTG-TEST-0322] Using Network framework with TLS is secure
     static func secureNetworkConnection(completion: @escaping (String) -> Void) {
         var result = "Testing secure Network framework connection:\n\n"
         

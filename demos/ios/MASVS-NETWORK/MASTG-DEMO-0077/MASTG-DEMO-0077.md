@@ -3,7 +3,7 @@ platform: ios
 title: Hardcoded HTTP URLs in iOS Binary
 code: [swift]
 id: MASTG-DEMO-0077
-test: MASTG-TEST-0313
+test: MASTG-TEST-0321
 kind: fail
 ---
 
@@ -35,5 +35,5 @@ The test fails because hardcoded HTTP URLs were found in the binary. The URLs `h
 To determine if these URLs are actually used for network communication:
 
 1. Review the code context where these URLs are referenced. For example, use the `from` offset from the output to locate the surrounding code in the binary (e.g. `s <from>; pd 20` in radare2).
-2. Check if ATS exceptions are configured to allow cleartext traffic (see @MASTG-TEST-0314).
+2. Check if ATS exceptions are configured to allow cleartext traffic (see @MASTG-TEST-0322).
 3. Perform dynamic analysis to observe actual network traffic (see @MASTG-TEST-0236).

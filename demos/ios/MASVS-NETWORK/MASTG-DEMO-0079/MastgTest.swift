@@ -6,7 +6,7 @@ struct MastgTest {
     static func mastgTest(completion: @escaping (String) -> Void) {
         var result = "Testing BSD socket connection (bypasses ATS):\n\n"
         
-        // FAIL: [MASTG-TEST-0315] Using BSD sockets bypasses ATS
+        // FAIL: [MASTG-TEST-0322] Using BSD sockets bypasses ATS
         let host = "httpbin.org"
         let port: UInt16 = 80
         

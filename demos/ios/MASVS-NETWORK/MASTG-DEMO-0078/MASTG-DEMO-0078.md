@@ -3,7 +3,7 @@ platform: ios
 title: Uses of Network Framework Bypassing ATS
 code: [swift]
 id: MASTG-DEMO-0078
-test: MASTG-TEST-0315
+test: MASTG-TEST-0322
 kind: fail
 ---
 
