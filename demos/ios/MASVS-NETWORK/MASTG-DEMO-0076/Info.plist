@@ -4,11 +4,9 @@
 	<dict>
 		<key>NSAppTransportSecurity</key>
 		<dict>
-			<!-- Global cleartext allowance -->
 			<key>NSAllowsArbitraryLoads</key>
 			<true />
 
-			<!-- More broad allowances -->
 			<key>NSAllowsArbitraryLoadsInWebContent</key>
 			<true />
 			<key>NSAllowsArbitraryLoadsForMedia</key>
@@ -16,28 +14,23 @@
 			<key>NSAllowsArbitraryLoadsForLocalNetworking</key>
 			<true />
 
-			<!-- Domain specific exceptions -->
 			<key>NSExceptionDomains</key>
 			<dict>
 
 				<key>api.example.com</key>
 				<dict>
-					<!-- Cleartext HTTP allowed for this domain -->
 					<key>NSExceptionAllowsInsecureHTTPLoads</key>
 					<true />
-					<!-- Weakened TLS requirements -->
 					<key>NSExceptionRequiresForwardSecrecy</key>
 					<false />
 					<key>NSTemporaryExceptionMinimumTLSVersion</key>
 					<string>TLSv1.0</string>
-					<!-- Applies to subdomains too -->
 					<key>NSIncludesSubdomains</key>
 					<true />
 				</dict>
 
 				<key>httpbin.org</key>
 				<dict>
-					<!-- Another cleartext enabling pattern -->
 					<key>NSExceptionAllowsInsecureHTTPLoads</key>
 					<true />
 					<key>NSExceptionMinimumTLSVersion</key>
