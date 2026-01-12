@@ -99,7 +99,7 @@ The following table summarizes the per-domain ATS exceptions. For more informati
 | `NSExceptionMinimumTLSVersion` | Allows connections to servers with TLS versions less than 1.2 |
 | `NSExceptionRequiresForwardSecrecy` | Disable perfect forward secrecy (PFS) |
 
-You may encounter expection keys prefixed with `NSTemporaryException...` in old examples or documentation. These keys were originally introduced as temporary ATS exception helpers during the early iOS 9 era and while they still work, they are deprecated and undocumented by Apple. Developers should use the modern non-temporary `NSException...` equivalents instead.
+You may encounter exception keys prefixed with `NSTemporaryException...` in old examples or documentation. These keys were originally introduced as temporary ATS exception helpers during the early iOS 9 era and while they still work, they are deprecated and undocumented by Apple. Developers should use the modern non-temporary `NSException...` equivalents instead.
 
 **Justifying Exceptions:**
 
