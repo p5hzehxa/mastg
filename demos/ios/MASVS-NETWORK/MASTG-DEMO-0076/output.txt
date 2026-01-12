@@ -3,6 +3,4 @@ json.NSAppTransportSecurity.NSAllowsArbitraryLoadsForLocalNetworking = true;
 json.NSAppTransportSecurity.NSAllowsArbitraryLoadsForMedia = true;
 json.NSAppTransportSecurity.NSAllowsArbitraryLoadsInWebContent = true;
 json.NSAppTransportSecurity.NSExceptionDomains["api.example.com"].NSExceptionAllowsInsecureHTTPLoads = true;
-json.NSAppTransportSecurity.NSExceptionDomains["cdn.example.net"].NSAllowsArbitraryLoads = true;
-json.NSAppTransportSecurity.NSExceptionDomains["cdn.example.net"].NSExceptionAllowsInsecureHTTPLoads = true;
-json.NSAppTransportSecurity.NSExceptionDomains["cdn.example.net"].NSTemporaryExceptionAllowsInsecureHTTPLoads = true;
+json.NSAppTransportSecurity.NSExceptionDomains["httpbin.org"].NSExceptionAllowsInsecureHTTPLoads = true;

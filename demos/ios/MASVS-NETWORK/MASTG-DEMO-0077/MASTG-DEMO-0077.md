@@ -11,7 +11,7 @@ kind: fail
 
 The code snippet below shows sample code that uses hardcoded HTTP URLs:
 
-{{ MastgTest.swift }}
+{{ ../MASTG-DEMO-0076/MastgTest.swift }}
 
 ### Steps
 
